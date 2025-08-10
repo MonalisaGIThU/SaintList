@@ -1,0 +1,458 @@
+  transform: translateY(-2px);
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans Thai', sans-serif;
+  /* Warm cream background for the butter bear theme. Removed the old repeating pattern image */
+  background:
+    linear-gradient(rgba(255, 248, 231, 1), rgba(255, 248, 231, 1));
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  /* Dark brown text for readability */
+  color: #4E342E;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(90deg, #FDEBB0 0%, #F9C981 100%);
+  padding: 1.2rem 1rem;
+  border-bottom: 4px solid #F2A854;
+  color: #5D4037;
+}
+
+header .bear-icon {
+  width: 80px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+header .header-text h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #5D4037;
+}
+
+header .header-text p {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #795548;
+}
+
+main {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+section {
+  margin-bottom: 2rem;
+  /* Soft cream card backgrounds */
+  background-color: #FFFBF2;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 2rem;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  color: #4caf50;
+}
+
+/* Form styles */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Table styles */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+#itemTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#itemTable th,
+#itemTable td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#itemTable th {
+  /* Soft background for table headers */
+  background-color: #FDECCF;
+  font-weight: 600;
+  color: #5D4037;
+}
+
+#itemTable tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+#itemTable td:last-child {
+  text-align: center;
+}
+
+/* Totals */
+.totals {
+  margin-top: 1rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-size: 100% 100%;
+}
+
+.btn.primary {
+  /* Golden tone for primary actions with gradient */
+  background-image: linear-gradient(to bottom, #FFDE7D, #FBC02D);
+  color: #5D4037;
+}
+
+.btn.primary:hover {
+  background-image: linear-gradient(to bottom, #FBC02D, #F9A825);
+}
+
+.btn.secondary {
+  background-image: linear-gradient(to bottom, #BCA89E, #8D6E63);
+  color: #5D4037;
+}
+
+.btn.secondary:hover {
+  background-image: linear-gradient(to bottom, #9E7C6E, #6D4C41);
+}
+
+.btn.success {
+  background-image: linear-gradient(to bottom, #A8E6A1, #81C784);
+  color: #5D4037;
+}
+
+.btn.success:hover {
+  background-image: linear-gradient(to bottom, #81C784, #66BB6A);
+}
+
+.btn.warning {
+  background-image: linear-gradient(to bottom, #FFD78F, #FFB74D);
+  color: #5D4037;
+}
+
+.btn.warning:hover {
+  background-image: linear-gradient(to bottom, #FFB74D, #FFA726);
+}
+
+.btn.danger {
+  background-image: linear-gradient(to bottom, #F5A7A7, #E57373);
+  color: #5D4037;
+}
+
+.btn.danger:hover {
+  background-image: linear-gradient(to bottom, #E57373, #EF5350);
+}
+
+/* Generic hover effect for all buttons */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Info button style for previewing the bill */
+.btn.info {
+  background-image: linear-gradient(to bottom, #A7D3F8, #64B5F6);
+  color: #5D4037;
+}
+
+.btn.info:hover {
+  background-image: linear-gradient(to bottom, #64B5F6, #42A5F5);
+}
+
+/* Modal styles */
+.modal.hidden {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #FFFBF2;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.close {
+  /* Position the close icon in the top‑right corner of modals/overlays */
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  /* Increase the touch target of the close icon to improve usability on touch devices */
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #795548;
+}
+
+.close:hover {
+  color: #5D4037;
+}
+
+.summary-text textarea {
+  width: 100%;
+  height: 200px;
+  resize: vertical;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.save-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.save-list label {
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+/* Icon styling for form labels */
+.label-icon {
+  margin-right: 0.4rem;
+  font-size: 1.1rem;
+  vertical-align: middle;
+}
+
+.save-list input {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.save-list button {
+  flex-shrink: 0;
+}
+
+/* Saved lists controls */
+.list-management .saved-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.list-management select {
+  flex-grow: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments for mobile screens */
+@media (max-width: 600px) {
+  header {
+    padding: 1rem;
+  }
+  main {
+    padding: 0 0.5rem;
+  }
+  section {
+    padding: 1rem;
+  }
+  .saved-controls,
+  .form-actions,
+  .totals,
+  .save-list {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .saved-controls select,
+  .form-actions button,
+  .save-list input,
+  .save-list button,
+  .save-list label {
+    width: 100%;
+  }
+  .saved-controls button,
+  .form-actions button {
+    margin-top: 0.5rem;
+  }
+  .save-list input {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Bill/Invoice overlay styles */
+.bill-content {
+  background-color: #FFFBF2;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.bill-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #4caf50;
+}
+
+.bill-content p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.bill-table th,
+.bill-table td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.bill-table th {
+  background-color: #FDECCF;
+  font-weight: 600;
+  color: #5D4037;
+}
+
+/* Invoice/bill icon inside the bill overlay */
+.bill-icon {
+  width: 80px;
+  height: auto;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+/* Decorative bear images positioned around the page */
+.decorations img {
+  position: fixed;
+  /* Place decorations above the content but below modals */
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Large bottom‑left bear */
+.decor-left {
+  bottom: 5%;
+  left: 1%;
+  width: 220px;
+  max-width: 45vw;
+}
+
+/* Large bottom‑right bear */
+.decor-right {
+  bottom: 5%;
+  right: 1%;
+  width: 220px;
+  max-width: 45vw;
+}
+
+/* Small top‑right bear */
+.decor-top-right {
+  top: 6%;
+  right: 2%;
+  width: 120px;
+  max-width: 25vw;
+}
+
+/* Small top‑left bear */
+.decor-top-left {
+  top: 6%;
+  left: 2%;
+  width: 100px;
+  max-width: 20vw;
+}
+
+/* Hide some decorations on very small screens to prevent clutter */
+@media (max-width: 600px) {
+  .decor-left,
+  .decor-right {
+    width: 120px;
+  }
+  .decor-top-right,
+  .decor-top-left {
+    width: 80px;
+  }
+}
