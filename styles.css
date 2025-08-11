@@ -228,6 +228,14 @@ h2 {
   font-size: 1.4rem;
   font-weight: 600;
   color: #E65100; /* deep orange accent for headings */
+  cursor: pointer;
+  /* Hide the default arrow marker for <summary> in Chrome */
+  list-style: none;
+}
+
+/* Remove the default arrow from summary elements (for WebKit/Blink) */
+.category-section summary::-webkit-details-marker {
+  display: none;
 }
 
 .category-section .grid {

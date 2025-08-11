@@ -132,6 +132,164 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   /**
+   * Price overrides extracted from the PDF provided by the customer. The keys
+   * correspond to item names and the values are the corrected price per unit.
+   * When the application loads, these overrides will update the default price
+   * and cost for any matching item in itemsData. Items without an override
+   * retain their original price and cost.
+   */
+  const priceOverrides = {
+    "ลีโอ": 640.0,
+    "แลคตาซอย": 345.0,
+    "ลีโอ กระป๋อง": 760.0,
+    "โฟร์โมสต์จืด": 130.0,
+    "ช้าง": 625.0,
+    "โฟร์โมสต์หวาน": 130.0,
+    "ช้างกระป๋อง": 715.0,
+    "โฟร์โมสต์ช๊อค": 130.0,
+    "เสือเล็ก": 1730.0,
+    "ดีน่า เขียว": 125.0,
+    "ขาวเล็ก": 1390.0,
+    "ดีน่า งาดำ": 100.0,
+    "หงษ์กลม": 245.0,
+    "โอวัลตินกล่อง": 125.0,
+    "หงษ์แบน": 1595.0,
+    "ดัชมิลล เขียว": 100.0,
+    "285 กลม": 258.0,
+    "ไวตามิลค์": 120.0,
+    "แสงโสมกลม": 295.0,
+    "สายน้ำผึ้งเล็ก": 50.0,
+    "แสงโสมแบน": 2916.0,
+    "สายน้ำผึ้งใหญ่": 100.0,
+    "สปายชมพู": 620.0,
+    "กะปิกุ้ง": 135.0,
+    "SMS เขียว": 660.0,
+    "น้ำมันหอยกลาง": 36.0,
+    "SMS แดง": 660.0,
+    "น้ำมันหอยเล็ก": 23.0,
+    "สมอ": 160.0,
+    "สุกี้พันท้ายขวดเล็ก": 55.0,
+    "แมวเขียว": 145.0,
+    "ภูเขาทองเล็ก": 17.0,
+    "กระดาษสมอ": 70.0,
+    "เต้าเจี๊ยวเล็ก": 20.0,
+    "กระดาษไก่": 30.0,
+    "ซีอิ้วดำหวานเล็ก": 12.0,
+    "M150": 105.0,
+    "ซีอิ้วขาวเล็ก": 22.0,
+    "ลิโพ": 105.0,
+    "น้ำส้มสายชูเล็ก": 11.0,
+    "คาราบาว": 500.0,
+    "ซอสมะเขือเทศเล็ก": 18.0,
+    "ซอสพริกเล็ก": 12.5,
+    "โสม": 87.0,
+    "น้ำจิ้มไก่เล็ก": 23.0,
+    "กระทิงแดง": 105.0,
+    "ปลาร้าไมค": 31.0,
+    "สปอนเซอร์": 245.0,
+    "สามแม่ครัว": 200.0,
+    "โซดาวันเวย์": 195.0,
+    "โรซา": 185.0,
+    "เป๊บซี่ใหญ่": 350.0,
+    "นมข้นหวาน": 24.0,
+    "เป็บซี่เล็ก": 275.0,
+    "ผักกระป๋อง": 110.0,
+    "เบอร์ดี้แดงกระป๋อง": 420.0,
+    "กะทิกล่อง": 135.0,
+    "เนสเขียวกระป๋อง": 355.0,
+    "ชูรส": 180.0,
+    "เนสซองแดง": 210.0,
+    "รสดี 5 บาท": 115.0,
+    "เนสซองเขียว": 210.0,
+    "รสดี 13 บาท": 115.0,
+    "โอวัลตินซอง": 110.0,
+    "คนอร์ก้อน จืด": 145.0,
+    "ซันไลต์": 60.0,
+    "ทิพรสเล็ก": 345.0,
+    "ไบกอนกล่อง": 90.0,
+    "ทิพรสใหญ่": 315.0,
+    "ไบกอน กระป๋อง": 58.0,
+    "ธูปแหนบ": 225.0,
+    "แปรงสีฟัน": 95.0,
+    "ธูปกำ": 100.0,
+    "คอลเกตเล็ก": 150.0,
+    "แบรนด์เล็ก": 365.0,
+    "ดาร์ลี่เล็ก": 140.0,
+    "แบรนด์ใหญ่": 580.0,
+    "แป้งแคร์เล็ก": 120.0,
+    "ไฟแช็ค": 210.0,
+    "แป้งเภสัช": 130.0,
+    "วุ้นเส้นเล็ก": 80.0,
+    "ลักซ์": 35.0,
+    "วุ้นเส้นใหญ่": 120.0,
+    "โพรเทค": 50.0,
+    "ไวไว อบแห้ง": 150.0,
+    "ซันซิลขวดเล็ก": 100.0,
+    "โกกิ": 170.0,
+    "โดฟขวด": 100.0,
+    "มาม่าต้มยำกุ้ง": 180.0,
+    "คลินิก ขวดเล็ก": 130.0,
+    "มาม่าต้มยำกุ้งน้ำข้น": 180.0,
+    "รีจอยซ์ขวด": 100.0,
+    "มาม่าหมูสับ": 180.0,
+    "โอโมพลัส": 90.0,
+    "มาม่าเส้นหมี่น้ำใส": 180.0,
+    "บรีสเอกเซล": 90.0,
+    "ไวไว": 180.0,
+    "อีซี่": 90.0,
+    "ควิกต้มโคล้ง": 180.0,
+    "บริสน้ำ": 48.0,
+    "มาม่าถ้วยต้มยำกุ้ง": 72.0,
+    "คอมฟอรท ฟ้า": 72.0,
+    "มาม่าถ้วยหมูสับ": 72.0,
+    "คอมฟอรท ชมพู": 72.0,
+    "โจ๊กถ้วย": 90.0,
+    "ดาวนี่ แดง": 90.0,
+    "โซฟีกลางคืน": 160.0,
+    "ดาวนี่ ฟ้า": 90.0,
+    "โซฟีปีก": 120.0,
+    "เมอรี่ไบรท ทวิน": 0.0,
+    "ลอริเอะปีก": 120.0,
+    "เมอรี่ไบรท เขียว": 0.0,
+    "ยาทากันยุง ซอฟเฟล": 95.0,
+    "ฝอยขัดหม้อ": 0.0,
+    "ยูโร่": 50.0,
+    "ฟองน้ำตาข่าย": 0.0,
+    "ยูโร่ ช๊อคโกแลต": 50.0,
+    "เฮลบลูบอย": 42.0,
+    "ปังหิมะ": 50.0,
+    "กระดาษทิชชู่": 75.0,
+    "เปี๊ยะไก่หยอง": 50.0,
+    "ถุง  3 x 5": 20.0,
+    "ขนมกรอบ": 50.0,
+    "ถุงร้อน  6 x 9": 37.0,
+    "ฮอลล์ขาว": 50.0,
+    "ถุงหิ้ว 6 x 11 บาง": 0.0,
+    "ฮอลล์เหลือง": 50.0,
+    "ถุงหิ้ว 6 x 14 บาง": 90.0,
+    "ฮอลล์ม่วง": 50.0,
+    "ถุงหิ้ว 8 x 16  บาง": 0.0,
+    "ลูกอมกาแฟโกปิโก้": 50.0,
+    "ถุงน้ำขวด 6 x 12": 40.0,
+    "หมากฝรั่ง": 50.0,
+    "ถ่านไฟฉายAA": 275.0,
+    "เม็ดฟักทองตรามือ": 50.0,
+    "เม็ดแตงโม M 16": 50.0,
+    "0 8423.5": 0.0,
+  };
+
+  // Apply the overrides to the default items. If a product name exists in
+  // priceOverrides, replace its price and cost with the provided value. This
+  // ensures the default prices reflect the most up-to-date information.
+  itemsData.forEach((item) => {
+    const override = priceOverrides[item.name];
+    if (override !== undefined) {
+      item.price = override;
+      item.cost = override;
+    }
+  });
+
+  /**
    * Load persistent data from localStorage
    */
   function loadData() {
@@ -618,14 +776,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Define display order for categories. Unlisted categories will appear at the end.
     const orderedCategories = ['เหล้า/บุหรี่', 'เครื่องดื่ม', 'ทำความสะอาด/ซักผ้า', 'เครื่องปรุงรส', 'ขนม', 'อื่นๆ'];
     const categories = [...orderedCategories.filter((c) => groups[c]), ...Object.keys(groups).filter((c) => !orderedCategories.includes(c))];
-    categories.forEach((cat) => {
-      const section = document.createElement('div');
+    categories.forEach((cat, index) => {
+      // Use a <details> element to provide dropdown/collapsible functionality for each category.
+      // The <summary> acts as the heading and is clickable to toggle visibility of the grid.
+      const section = document.createElement('details');
       section.className = 'category-section';
-      // Heading
-      const heading = document.createElement('h3');
-      heading.className = 'category-heading';
-      heading.textContent = cat;
-      section.appendChild(heading);
+      // Open the first category by default for better UX
+      if (index === 0) section.open = true;
+      const summary = document.createElement('summary');
+      summary.className = 'category-heading';
+      summary.textContent = cat;
+      section.appendChild(summary);
       // Grid container for this category
       const grid = document.createElement('div');
       grid.className = 'grid';
