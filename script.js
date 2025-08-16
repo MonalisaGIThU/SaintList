@@ -289,6 +289,284 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // After applying price overrides, update the categories of existing products and
+  // add any missing products defined by the customer. We maintain a mapping
+  // from product names (trimmed) to their intended category. If a product
+  // appears in this mapping, its category is replaced accordingly. This
+  // ensures that all products fall under the new category headings instead of
+  // legacy ones like "เหล้า/บุหรี่" or "ทำความสะอาด/ซักผ้า".
+  const categoryUpdates = {
+    // เหล้า
+    'ลีโอ': 'เหล้า',
+    'ลีโอ กระป๋อง': 'เหล้า',
+    'ช้าง': 'เหล้า',
+    'ช้างกระป๋อง': 'เหล้า',
+    'เสือเล็ก': 'เหล้า',
+    'ขาวเล็ก': 'เหล้า',
+    'หงษ์กลม': 'เหล้า',
+    'หงษ์แบน': 'เหล้า',
+    '285 กลม': 'เหล้า',
+    'แสงโสมกลม': 'เหล้า',
+    'แสงโสมแบน': 'เหล้า',
+    'สปายชมพู': 'เหล้า',
+    'โซดาวันเวย์': 'เหล้า',
+    // บุหรี่
+    'SMS เขียว': 'บุหรี่',
+    'SMS แดง': 'บุหรี่',
+    'สมอ': 'บุหรี่',
+    'แมวเขียว': 'บุหรี่',
+    'กระดาษสมอ': 'บุหรี่',
+    'กระดาษไก่': 'บุหรี่',
+    // น้ำ
+    'M150': 'น้ำ',
+    'ลิโพ': 'น้ำ',
+    'คาราบาว (แพค)': 'น้ำ',
+    'คาราบาว (กล่อง)': 'น้ำ',
+    'คาราบาว': 'น้ำ',
+    'โสม': 'น้ำ',
+    'กระทิงแดง': 'น้ำ',
+    'สปอนเซอร์': 'น้ำ',
+    'เป๊บซี่ใหญ่': 'น้ำ',
+    'เป็บซี่เล็ก': 'น้ำ',
+    'เบอร์ดี้แดงกระป๋อง': 'น้ำ',
+    'เนสเขียวกระป๋อง': 'น้ำ',
+    'เนสซองแดง': 'น้ำ',
+    'เนสซองเขียว': 'น้ำ',
+    'โอวัลตินซอง': 'น้ำ',
+    'แลคตาซอย': 'น้ำ',
+    'โฟร์โมสต์จืด': 'น้ำ',
+    'โฟร์โมสต์หวาน': 'น้ำ',
+    'โฟร์โมสต์ช๊อค': 'น้ำ',
+    'ดีน่า เขียว': 'น้ำ',
+    'ดีน่า งาดำ': 'น้ำ',
+    'โอวัลตินกล่อง': 'น้ำ',
+    'ดัชมิลล เขียว': 'น้ำ',
+    'ไวตามิลค์': 'น้ำ',
+    'สายน้ำผึ้งเล็ก': 'น้ำ',
+    'สายน้ำผึ้งใหญ่': 'น้ำ',
+    'เฮลบลูบอย': 'น้ำ',
+    'แบรนด์เล็ก': 'น้ำ',
+    'แบรนด์ใหญ่': 'น้ำ',
+    // อาบน้ำ
+    'แปรงสีฟัน': 'อาบน้ำ',
+    'คอลเกตเล็ก': 'อาบน้ำ',
+    'ดาร์ลี่เล็ก': 'อาบน้ำ',
+    'แป้งแคร์เล็ก': 'อาบน้ำ',
+    'แป้งเภสัช': 'อาบน้ำ',
+    'ลักซ์': 'อาบน้ำ',
+    'โพรเทค': 'อาบน้ำ',
+    'ซันซิลขวดเล็ก': 'อาบน้ำ',
+    'โดฟขวด': 'อาบน้ำ',
+    'คลินิก ขวดเล็ก': 'อาบน้ำ',
+    'รีจอยซ์ขวด': 'อาบน้ำ',
+    // ทั่วไป
+    'ซันไลต์': 'ทั่วไป',
+    'ไบกอนกล่อง': 'ทั่วไป',
+    'ไบกอน กระป๋อง': 'ทั่วไป',
+    'เมอรี่ไบรท ทวิน': 'ทั่วไป',
+    'เมอรี่ไบรท เขียว': 'ทั่วไป',
+    'ฝอยขัดหม้อ': 'ทั่วไป',
+    'ฟองน้ำตาข่าย': 'ทั่วไป',
+    'กระดาษทิชชู่': 'ทั่วไป',
+    'ถุง  3 x 5': 'ทั่วไป',
+    'ถุงร้อน  6 x 9': 'ทั่วไป',
+    'ถุงหิ้ว 6 x 11 บาง': 'ทั่วไป',
+    'ถุงหิ้ว 6 x 14 บาง': 'ทั่วไป',
+    'ถุงหิ้ว 8 x 16  บาง': 'ทั่วไป',
+    'ถุงน้ำขวด 6 x 12': 'ทั่วไป',
+    'ยาทากันยุง ซอฟเฟล': 'ทั่วไป',
+    'ถ่านไฟฉายAA': 'ทั่วไป',
+    'ถ่านไฟฉายAAA': 'ทั่วไป',
+    'ธูปแหนบ': 'ทั่วไป',
+    'ธูปกำ': 'ทั่วไป',
+    'ไฟแช็ค': 'ทั่วไป',
+    // ซักผ้า
+    'โอโมพลัส': 'ซักผ้า',
+    'บรีสเอกเซล': 'ซักผ้า',
+    'อีซี่': 'ซักผ้า',
+    'บริสน้ำ': 'ซักผ้า',
+    'คอมฟอรท ฟ้า': 'ซักผ้า',
+    'คอมฟอรท ชมพู': 'ซักผ้า',
+    'ดาวนี่ แดง': 'ซักผ้า',
+    'ดาวนี่ ฟ้า': 'ซักผ้า',
+    // เครื่องครัว
+    'กะปิกุ้ง': 'เครื่องครัว',
+    'น้ำมันหอยกลาง': 'เครื่องครัว',
+    'น้ำมันหอยเล็ก': 'เครื่องครัว',
+    'สุกี้พันท้ายขวดเล็ก': 'เครื่องครัว',
+    'ภูเขาทองเล็ก': 'เครื่องครัว',
+    'เต้าเจี๊ยวเล็ก': 'เครื่องครัว',
+    'ซีอิ้วดำหวานเล็ก': 'เครื่องครัว',
+    'ซีอิ้วขาวเล็ก': 'เครื่องครัว',
+    'น้ำส้มสายชูเล็ก': 'เครื่องครัว',
+    'ซอสมะเขือเทศเล็ก': 'เครื่องครัว',
+    'ซอสพริกเล็ก': 'เครื่องครัว',
+    'น้ำจิ้มไก่เล็ก': 'เครื่องครัว',
+    'ปลาร้าไมค': 'เครื่องครัว',
+    'สามแม่ครัว': 'เครื่องครัว',
+    'โรซา': 'เครื่องครัว',
+    'นมข้นหวาน': 'เครื่องครัว',
+    'ผักกระป๋อง': 'เครื่องครัว',
+    'กะทิกล่อง': 'เครื่องครัว',
+    'ชูรส': 'เครื่องครัว',
+    'รสดี 5 บาท': 'เครื่องครัว',
+    'รสดี 13 บาท': 'เครื่องครัว',
+    'คนอร์ก้อน จืด': 'เครื่องครัว',
+    'ทิพรสเล็ก': 'เครื่องครัว',
+    'วุ้นเส้นเล็ก': 'เครื่องครัว',
+    'วุ้นเส้นใหญ่': 'เครื่องครัว',
+    'ไวไว อบแห้ง': 'เครื่องครัว',
+    'โกกิ': 'เครื่องครัว',
+    // มาม่า
+    'มาม่าต้มยำกุ้ง': 'มาม่า',
+    'มาม่าต้มยำกุ้งน้ำข้น': 'มาม่า',
+    'มาม่าหมูสับ': 'มาม่า',
+    'มาม่าเส้นหมี่น้ำใส': 'มาม่า',
+    'ไวไว': 'มาม่า',
+    'ควิกต้มโคล้ง': 'มาม่า',
+    'มาม่าถ้วยต้มยำกุ้ง': 'มาม่า',
+    'มาม่าถ้วยหมูสับ': 'มาม่า',
+    'โจ๊กถ้วย': 'มาม่า',
+    // ผ้าอนามัย
+    'โซฟีกลางคืน': 'ผ้าอนามัย',
+    'โซฟีปีก': 'ผ้าอนามัย',
+    'ลอริเอะปีก': 'ผ้าอนามัย',
+    // ขนม
+    'ยูโร่': 'ขนม',
+    'ยูโร่ ช๊อคโกแลต': 'ขนม',
+    'ปังหิมะ': 'ขนม',
+    'เปี๊ยะไก่หยอง': 'ขนม',
+    'ขนมกรอบ': 'ขนม',
+    'ฮอลล์ขาว': 'ขนม',
+    'ฮอลล์เหลือง': 'ขนม',
+    'ฮอลล์ม่วง': 'ขนม',
+    'ลูกอมกาแฟโกปิโก้': 'ขนม',
+    'หมากฝรั่ง': 'ขนม',
+    'เม็ดฟักทองตรามือ': 'ขนม',
+    'เม็ดแตงโม M 16': 'ขนม',
+    // เอสน้ำขวด
+    'แพคเล็ก  ดำ': 'เอสน้ำขวด',
+    'แพคเล็ก  แดง': 'เอสน้ำขวด',
+    'แพคเล็ก  ส้ม': 'เอสน้ำขวด',
+    'แพคเล็ก  เขียว': 'เอสน้ำขวด',
+    'แพคเล็ก  สไปรท์': 'เอสน้ำขวด',
+    'แพคใหญ่  ดำ': 'เอสน้ำขวด',
+    'แพคใหญ่  แดง': 'เอสน้ำขวด',
+    'แพคใหญ่  ส้ม': 'เอสน้ำขวด',
+    'แพคใหญ่  เขียว': 'เอสน้ำขวด',
+    'แพคใหญ่  สไปรท์': 'เอสน้ำขวด',
+    'แพคใหญ่  ผสม': 'เอสน้ำขวด',
+    'โออิชิ กล่อง': 'เอสน้ำขวด',
+    'อิชิตัน ขวด': 'เอสน้ำขวด',
+    'จับใจ ขวด': 'เอสน้ำขวด',
+    'ชากูซ่า ม่วง': 'เอสน้ำขวด',
+    // ยาภายใน
+    'พาราแคป': 'ยาภายใน',
+    'ไทลีนอล': 'ยาภายใน',
+    'ทิฟฟี่': 'ยาภายใน',
+    'ดีคอลเจน': 'ยาภายใน',
+    'ยาแก้อักเสบ': 'ยาภายใน',
+    'ยาแก้แพ้': 'ยาภายใน',
+    'ยาแก้เมารถ': 'ยาภายใน',
+    'ยาแก้ท้องเสีย': 'ยาภายใน',
+    'ยาคุม': 'ยาภายใน',
+    'ยาแก้ไอ': 'ยาภายใน',
+    'อีโน': 'ยาภายใน',
+    'เกลือแร่': 'ยาภายใน',
+    'ยาแก้ไอเสือดาว': 'ยาภายใน',
+    'ยาธาตุน้ำขาว เล็ก': 'ยาภายใน',
+    'ยาธาตุน้ำขาว ใหญ่': 'ยาภายใน',
+    'ทัมใจ': 'ยาภายใน',
+    'ยาแก้ปวดฟัน': 'ยาภายใน',
+    'ยาคลายเส้น': 'ยาภายใน',
+    // ยาภายนอก
+    'ยาดม': 'ยาภายนอก',
+    'ยาหม่อง': 'ยาภายนอก',
+    'พลาสเตอร์ปิดแผล': 'ยาภายนอก',
+    'แปะแก้ปวด': 'ยาภายนอก'
+  };
+
+  // Add or update category for each existing item
+  itemsData.forEach((item) => {
+    const key = (item.name || '').trim();
+    if (categoryUpdates[key]) {
+      item.category = categoryUpdates[key];
+    }
+  });
+
+  // Define any additional items that are not present in itemsData. These
+  // objects include the name, unit, default price/cost (0 means unspecified),
+  // and the correct category. They will be added only if an item with the
+  // same trimmed name does not already exist.
+  const additionalItems = [
+    // มาม่า extras
+    { name: 'ไวไว', unit: 'กล่อง', price: 0, cost: 0, category: 'มาม่า' },
+    { name: 'ควิกต้มโคล้ง', unit: 'กล่อง', price: 0, cost: 0, category: 'มาม่า' },
+    { name: 'มาม่าถ้วยต้มยำกุ้ง', unit: 'แพค6', price: 0, cost: 0, category: 'มาม่า' },
+    { name: 'มาม่าถ้วยหมูสับ', unit: 'แพค', price: 0, cost: 0, category: 'มาม่า' },
+    { name: 'โจ๊กถ้วย', unit: 'แพค6', price: 0, cost: 0, category: 'มาม่า' },
+    // ทั่วไป extras
+    { name: 'เมอรี่ไบรท ทวิน', unit: 'แผง', price: 0, cost: 0, category: 'ทั่วไป' },
+    { name: 'เมอรี่ไบรท เขียว', unit: 'แผง', price: 0, cost: 0, category: 'ทั่วไป' },
+    { name: 'ยาทากันยุง ซอฟเฟล', unit: 'แผง', price: 0, cost: 0, category: 'ทั่วไป' },
+    { name: 'ธูปแหนบ', unit: 'ห่อ', price: 0, cost: 0, category: 'ทั่วไป' },
+    { name: 'ธูปกำ', unit: 'ห่อ', price: 0, cost: 0, category: 'ทั่วไป' },
+    { name: 'ไฟแช็ค', unit: 'แพค', price: 0, cost: 0, category: 'ทั่วไป' },
+    // เอสน้ำขวด extras
+    { name: 'แพคเล็ก  ดำ', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคเล็ก  แดง', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคเล็ก  ส้ม', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคเล็ก  เขียว', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคเล็ก  สไปรท์', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคใหญ่  ดำ', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคใหญ่  แดง', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคใหญ่  ส้ม', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคใหญ่  เขียว', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคใหญ่  สไปรท์', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'แพคใหญ่  ผสม', unit: 'แพค', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'โออิชิ กล่อง', unit: 'กล่อง', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'อิชิตัน ขวด', unit: 'ขวด', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'จับใจ ขวด', unit: 'ขวด', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    { name: 'ชากูซ่า ม่วง', unit: 'กล่อง', price: 0, cost: 0, category: 'เอสน้ำขวด' },
+    // ยาภายใน extras
+    { name: 'พาราแคป', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ไทลีนอล', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ทิฟฟี่', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ดีคอลเจน', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้อักเสบ', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้แพ้', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้เมารถ', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้ท้องเสีย', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาคุม', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้ไอ', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'อีโน', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'เกลือแร่', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้ไอเสือดาว', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาธาตุน้ำขาว เล็ก', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาธาตุน้ำขาว ใหญ่', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ทัมใจ', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาแก้ปวดฟัน', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    { name: 'ยาคลายเส้น', unit: '', price: 0, cost: 0, category: 'ยาภายใน' },
+    // ยาภายนอก extras
+    { name: 'ยาดม', unit: '', price: 0, cost: 0, category: 'ยาภายนอก' },
+    { name: 'ยาหม่อง', unit: '', price: 0, cost: 0, category: 'ยาภายนอก' },
+    { name: 'พลาสเตอร์ปิดแผล', unit: '', price: 0, cost: 0, category: 'ยาภายนอก' },
+    { name: 'แปะแก้ปวด', unit: '', price: 0, cost: 0, category: 'ยาภายนอก' }
+  ];
+
+  additionalItems.forEach((item) => {
+    const exists = itemsData.some((i) => i.name.trim() === item.name.trim());
+    if (!exists) {
+      itemsData.push({
+        name: item.name,
+        unit: item.unit,
+        price: item.price,
+        cost: item.cost,
+        category: item.category
+      });
+    }
+  });
+
   /**
    * Load persistent data from localStorage
    */
@@ -774,15 +1052,34 @@ document.addEventListener('DOMContentLoaded', () => {
       groups[cat].push(prod);
     });
     // Define display order for categories. Unlisted categories will appear at the end.
-    const orderedCategories = ['เหล้า/บุหรี่', 'เครื่องดื่ม', 'ทำความสะอาด/ซักผ้า', 'เครื่องปรุงรส', 'ขนม', 'อื่นๆ'];
+    // Updated categories to reflect distinct user-defined groups. Each category corresponds to the headings
+    // requested by the user. Items with categories not listed here will fall under "อื่นๆ".
+    const orderedCategories = [
+      'เหล้า',
+      'บุหรี่',
+      'น้ำ',
+      'อาบน้ำ',
+      'ทั่วไป',
+      'ซักผ้า',
+      'เครื่องครัว',
+      'มาม่า',
+      'ผ้าอนามัย',
+      'ขนม',
+      'เอสน้ำขวด',
+      'ยาภายใน',
+      'ยาภายนอก',
+      'อื่นๆ'
+    ];
     const categories = [...orderedCategories.filter((c) => groups[c]), ...Object.keys(groups).filter((c) => !orderedCategories.includes(c))];
-    categories.forEach((cat, index) => {
+    categories.forEach((cat) => {
       // Use a <details> element to provide dropdown/collapsible functionality for each category.
       // The <summary> acts as the heading and is clickable to toggle visibility of the grid.
       const section = document.createElement('details');
       section.className = 'category-section';
-      // Open the first category by default for better UX
-      if (index === 0) section.open = true;
+      // Start with categories collapsed by default. Users can expand a category
+      // by clicking on its heading. This creates a dropdown-like experience
+      // where each category's items are hidden until needed.
+      section.open = false;
       const summary = document.createElement('summary');
       summary.className = 'category-heading';
       summary.textContent = cat;
